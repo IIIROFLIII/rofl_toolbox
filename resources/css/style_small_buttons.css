@@ -1,0 +1,57 @@
+QPushButton {
+    background-color: #315642;
+    color: #fafafa;
+    border-radius: 2px;
+	border: 1px solid rgb(10, 10, 10);
+    font-weight: bold;
+    font-size: 10px;
+    padding: 0px 0px 0px 0px;
+    min-height: 15px;
+    max-height: 15px;
+    min-width: 15px;
+    max-width: 15px;
+}
+
+QPushButton::hover {
+    background-color: #5BE79B;
+    color: rgb(30, 30, 30);
+}
+
+QPushButton::pressed {
+    background-color: rgb(30, 30, 30);
+    color: #5BE79B;
+}
+
+QPushButton[checkboxBtn=false]::pressed {
+	background-color: transparent;
+	color: #fafafa;
+}
+
+QPushButton[checkboxBtn=true] {
+	background-color: transparent;
+	border: none;
+	font-size: 14px;
+	color: #fafafa;
+}
+
+QPushButton[checkboxBtn=true]::hover {
+	font-size: 14px;
+	border: none;
+	color: #fafafa;
+}
+
+QPushButton[checkboxBtn=false] {
+	background-color: transparent;
+	color: #fafafa;
+	font-size: 15px;
+	border: none;
+	border-radius: 3px;
+	height: 28px;
+	font-weight: bold;
+}
+
+QPushButton[checkboxBtn=false]::hover {
+	background-color: #47A6E5;
+	border-radius: 3px;
+}
+

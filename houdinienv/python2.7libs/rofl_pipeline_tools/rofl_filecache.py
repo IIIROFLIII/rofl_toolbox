@@ -1,0 +1,370 @@
+import os
+import time
+from glob import glob
+
+import hou
+
+from rofl_pipeline_tools.rofl_filecache_layer import FileCacheLayer
+from rofl_pipeline_tools.constants import ROFL_CACHE, ROFL_CACHE_LAYER, ROFL_SEQUENCER
+
+class FileCache(FileCacheLayer):
+    def __init__(self, node):
+        FileCacheLayer.__init__(self, node)
+
+    def __str__(self):
+        if not self.node_type_name == ROFL_CACHE:
+            return "The given node isn't a rofl_filecache"
+        return "success loading"
+
+    @property
+    def abc_sequence(self):
+        sequence = 1 if self.node.parm('sequence').eval() else 0
+        return sequence
+
+    @property
+    def build_from_path(self):
+        return self.node.parm("build_from_path")
+
+    @property
+    def detail_attributes(self):
+        return self.node.parm("detailAttributes")
+
+    @property
+    def dopnet(self):
+        return self.node.parm('dopnet')
+
+    @property
+    def explicit_cache(self):
+        return self.node.parm('explicitcache')
+
+    @property
+    def explicit_cache_checkpoint_spacing(self):
+        return self.node.parm('explicitcachecheckpointspacing')
+
+    @property
+    def explicit_cache_name(self):
+        return self.node.parm('explicitcachename')
+
+    @property
+    def explicit_cache_nsteps(self):
+        return self.node.parm('explicitcachensteps')
+
+    @property
+    def file_abc(self):
+        return hou.node(self.node_path + '/alembic1')
+
+    @property
+    def frame_to_load(self):
+        return self.node.parm('frameToLoad')
+
+    @property
+    def link_layers(self):
+        return self.node.parm('linkLayers')
+
+    @property
+    def motion_blur(self):
+        return self.node.parm("motionBlur")
+
+    @property
+    def packed_transform(self):
+        return self.node.parm("packed_transform")
+
+    @property
+    def path_attrib(self):
+        return self.node.parm("path_attrib")
+
+    @property
+    def point_attributes(self):
+        return self.node.parm("pointAttributes")
+
+    @property
+    def preframe(self):
+        return self.node.parm('preframe')
+
+    @property
+    def postrender(self):
+        return self.node.parm('postrender')
+
+    @property
+    def prim_to_detail(self):
+        return self.node.parm("prim_to_detail_pattern")
+
+    @property
+    def primitive_attributes(self):
+        return self.node.parm("primitiveAttributes")
+
+    @property
+    def rop_abc(self):
+        return hou.node(self.node_path + '/rop_alembic1')
+
+    @property
+    def rop_geo(self):
+        return hou.node(self.node_path + '/rop_geometry1')
+
+    @property
+    def samples(self):
+        return self.node.parm("samples")
+
+    @property
+    def save_to_disk(self):
+        return self.node.parm('saveToDisk')
+
+    @property
+    def shutter1(self):
+        return self.node.parm("shutter1")
+
+    @property
+    def shutter2(self):
+        return self.node.parm("shutter2")
+
+    @property
+    def vertex_attributes(self):
+        return self.node.parm("vertexAttributes")
+
+    def _find_frame(self):
+        """
+        find the frame to use in the file path
+        Returns: frame in str format
+
+        """
+        frame = ""
+        if self.geo_type.evalAsString() == "abc" and self.abc_sequence == 0:
+            return frame
+        if self.trange.evalAsString() == "off":
+            frame = self.frame_to_load.eval()
+        else:
+            frame = hou.frame()
+
+        return format(int(frame), "04d")
+
+    def cache_time(self):
+        texte = "import time\n" \
+                "import datetime\n" \
+                "\n" \
+                "node = hou.pwd()\n" \
+                "\n" \
+                "startTime = {0}\n" \
+                "endTime = time.time()\n" \
+                "timeSim = str(datetime.timedelta(seconds=endTime-startTime))\n" \
+                "\n" \
+                "node.parent().parm('cacheTime').set(timeSim)".format(str(time.time()))
+
+        self.postrender.set(texte)
+
+    def checkpoints(self):
+        """
+        connect the rofl filecache checkpoints parameters to the selected dopnet checkpoints parameters
+        Returns: True if succeed
+
+        """
+        if not self.explicit_cache.eval():
+            if self.dopnet.evalAsNode():
+                self.dopnet.evalAsNode().parm('explicitcache').set(0)
+            return True
+
+        if not self.dopnet.evalAsNode():
+            hou.ui.displayMessage("Please, Set a Correct Dopnode path")
+            return False
+
+        parms = {}
+        parms['explicitcache'] = self.explicit_cache.eval()
+        parms['explicitcachename'] = self.explicit_cache_name.rawValue()
+        parms['explicitcachensteps'] = self.explicit_cache_nsteps.eval()
+        parms['explicitcachecheckpointspacing'] = self.explicit_cache_checkpoint_spacing.eval()
+        for i in parms.keys():
+            self.dopnet.evalAsNode().parm(i).set(parms[i])
+
+        return True
+
+    def clean_files(self):
+        """
+        delete all .sim files generated by an attached dop
+        """
+        if not self.checkpoints():
+            return False
+
+        folder = os.path.dirname(self.explicit_cache_name.eval())
+        files = glob(os.path.join(folder, "*.sim"))
+        for file in files:
+            os.remove(file)
+
+    def get_all_wedges_names(self, script_padding=False, increment=False, release=False, force_sid=None):
+        wedge_inputs = self.wedge_inputs.eval().split(" ")
+        wedge_inputs.remove("")
+        outputs = []
+
+        if not wedge_inputs:
+            path = self.output(script_padding=script_padding, increment=increment, force_sid=force_sid, release=release)
+            name = os.path.basename(path)
+            outputs.append(name)
+            return outputs
+
+        for i in wedge_inputs:
+            path = self.output(script_padding=script_padding, increment=increment, force_sid=force_sid,
+                               force_suffix=i, release=release)
+            name = os.path.basename(path)
+            outputs.append(name)
+        return outputs
+
+    def get_copy_files_infos(self, sid_src_version=None, sid_tgt_version=None, release=False):
+        files = {}
+        # voir si la protection du override ouput s applique ici sur les caches a recuperer
+        self.bdd.SID = sid_src_version
+        self.bdd.SID = self.bdd.sid_slice_to_version()
+        self.bdd.SID = self.bdd.sid_replace_version(self.read_version.evalAsString())
+        self.bdd.SID = self.bdd.build_SID_name(self.node_name)
+        if not self.search_release.eval():
+            folder = self.bdd.SID_cache_folder_filename(self.geo_type.evalAsString())
+        else:
+            folder = self.bdd.SID_release_cache_folder_filename(self.geo_type.evalAsString())
+
+        if not os.path.isdir(folder):
+            return files
+
+        file_sources = self.get_source_files(folder=folder)
+        if not file_sources:
+            return files
+
+        for file in file_sources:
+            filename = os.path.basename(file)
+            self.bdd.SID = self.bdd.conform_file_for_sid(filename)
+            self.bdd.SID = self.bdd.sid_replace_core(sid_tgt_version)
+
+            file_format = self.geo_type.evalAsString()
+            seq = 1 if self.abc_sequence and file_format == "abc" else 0
+            if not release:
+                tgt = self.bdd.SID_complete_cache_path(geo_type=file_format, abc_sequence=seq)
+            else:
+                tgt = self.bdd.SID_release_complete_cache_path(geo_type=file_format, abc_sequence=seq)
+
+            files[filename] = {"src": file, "tgt": tgt}
+        return files
+
+    def get_layers(self):
+        layers = []
+        allInputs = self.node.inputAncestors()
+        for i in allInputs:
+            nodeType = i.type().name()
+            # break the loop if we encounter a standrad rofl_filecache
+            if nodeType == ROFL_CACHE:
+                break
+            # activate / deactivate wedging on rofl filecache layer
+            if nodeType == ROFL_CACHE_LAYER:
+                layers.append(i)
+
+        return layers
+
+    def link_layer_reset_version(self):
+        layers = self.get_layers()
+        for i in layers:
+            i.parm("search_release").set(0)
+            i.parm("version").set("000")
+
+    def link_layers_toggle(self):
+        """
+        link the wedges values of a filecache on a filecachelayer
+        """
+        layers = self.get_layers()
+        for i in layers:
+            if self.link_layers.eval():
+                i.parm('wedge').setExpression('ch("{0}/wedge")'.format(self.node_path), replace_expression=True)
+                i.parm('wedgeSuffix').set('`chs("{0}/wedgeSuffix")`'.format(self.node_path))
+            else:
+                i.parm('wedge').deleteAllKeyframes()
+                i.parm('wedge').set(0)
+                i.parm('wedgeSuffix').revertToDefaults()
+
+    def output(self, iteration=0, script_padding=False, increment=False, release=False, force_sid=None, force_suffix=None):
+        """
+        set the output of the filecache
+        Returns: the output file path
+
+        """
+
+        format = self.geo_type.evalAsString()
+        frame = self.find_frame(script_padding=script_padding)
+        suffix = force_suffix if force_suffix else self.find_wedge_suffix(iteration=iteration)
+        search_release = self.search_release.eval()
+        self.bdd.SID = self.bdd.sid_replace_version(self.read_version.evalAsString()) if not force_sid else force_sid
+        self.bdd.SID = self.bdd.build_SID_file(name=self.node_name, wedge_suffix=suffix, frame=frame)
+
+        if release:
+            output = self.bdd.SID_release_complete_cache_path(geo_type=format, abc_sequence=self.abc_sequence)
+            return output
+
+        output = self.bdd.SID_complete_cache_path(geo_type=format, abc_sequence=self.abc_sequence)
+        if search_release:
+            if not increment:
+                output = self.bdd.SID_release_complete_cache_path(geo_type=format, abc_sequence=self.abc_sequence)
+            else:
+                output = self.bdd.SID_complete_cache_path(geo_type=format, abc_sequence=self.abc_sequence)
+
+        return output
+
+    def reload(self):
+        """
+        reload file or alembic sop in the filecache
+        """
+        if not self.geo_type.evalAsString() == 'abc':
+            self.file_geo.parm('reload').pressButton()
+        else:
+            self.file_abc.parm('reload').pressButton()
+
+    def save(self):
+        """
+        Launch the cache process
+        """
+        if not self.checkpoints():
+            return False
+        if self.multiple_inputs.eval():
+            hou.ui.displayMessage("Please, disable Read Multiple Input Function")
+            return False
+
+        self.search_release.set(0)
+        if not self.override_output.eval():
+            self.read_version.set("000")
+            self.link_layer_reset_version()
+
+        if not self.geo_type.evalAsString() == 'abc':
+            self.rop_geo.parm('execute').pressButton()
+            # SET SINGLE FRAME
+            if self.trange.evalAsString() == 'off':
+                self.frame_to_load.set(hou.frame())
+        else:
+            self.rop_abc.parm('execute').pressButton()
+
+        # RELOAD
+        self.reload()
+
+    def send_to_pdg(self):
+        """
+        create a rofl sequencer in a topnet
+        """
+        # CREATE TOPNET IF NOT EXIST
+        topInstances = hou.nodeType("Object/topnet").instances()
+        if not topInstances:
+            topNode = hou.node("/obj/").createNode("topnet")
+        else:
+            topNode = topInstances[0]
+        # CREATE SEQUENCER IF NOT EXIST
+        for i in hou.selectedNodes():
+            if not i.type().name() == self.node_type_name:
+                continue
+
+            cur_node = FileCache(i)
+            sequencerNode = hou.node(topNode.path() + '/' + cur_node.node_name)
+            if str(sequencerNode) == 'None':
+                sequencerNode = topNode.createNode(ROFL_SEQUENCER, cur_node.node_name)
+                sequencerNode.move([0, -1])
+                sequencerNode.parm('nodePath').set(cur_node.node_path)
+
+    def wedge_action(self):
+        """
+        manage the wedge suffix and search for filecache_layer to link the wedge suffix with
+        """
+        wedge = FileCacheLayer(self.node).wedge_action()
+        if wedge:
+            self.link_layers.set(1)
+        else:
+            self.link_layers.set(0)
+        self.link_layers_toggle()

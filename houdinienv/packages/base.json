@@ -1,0 +1,73 @@
+{
+    "env" : [
+        {
+            "var" : "ROFL_TOOLS",
+            "value" : 
+                [
+                    {"houdini_os == 'windows'": "D:/3D/pipeline_tools/rofl_toolbox"},
+                    {"houdini_os == 'linux'": "/mnt/408C65188C650A2C/3D/pipeline_tools/rofl_toolbox"}
+                ]
+        },
+        {
+            "var" : "HOUDINI_PATH",
+            "method" : "prepend",
+            "value" : "$ROFL_TOOLS/houdinienv"
+        },
+        { 
+            "var" : "PYTHONPATH",
+            "method" : "prepend",
+            "value" : 
+                [
+                    {"houdini_os == 'windows'": "D:/3D/pipeline_tools"},
+                    {"houdini_os == 'linux'": "/mnt/408C65188C650A2C/3D/pipeline_tools"}
+                ]
+        },
+        {
+            "var" : "HOUDINI_SPLASH_FILE",
+            "value" : "$ROFL_TOOLS/houdinienv/images/start.png"
+        },
+        {
+            "var" : "HOUDINI_SPLASH_MESSAGE",
+            "value" : "Welcome to FX Houdini"
+        },
+        {
+            "enable" : false,
+            "var" : "OCIO",
+            "value" : "$ROFL_TOOLS/ressources/lut/OpenColorIO-Configs-master/aces_1.0.3/config.ocio"
+        },
+        {
+            "var" : "VISUAL",
+            "value" : 
+                [
+                    {"houdini_os == 'windows'": "C:/Users/Flavien/AppData/Local/Programs/Microsoft VS Code/Code.exe"},
+                    {"houdini_os == 'linux'": "/usr/bin/code"}
+                ]
+        },
+        {
+            "var" : "EDITOR",
+            "value" :
+                [
+                    {"houdini_os == 'windows'": "C:/Users/Flavien/AppData/Local/Programs/Microsoft VS Code/Code.exe"},
+                    {"houdini_os == 'linux'": "/usr/bin/code"}
+                ]
+        },
+        {
+        "enable" : false,
+            "var" : "HOUDINI_NVIDIA_OPTIX_DSO_PATH",
+            "value" : 
+                [
+                    {"houdini_os == 'windows'": "C:/Users/Flavien/Documents/houdini17.0/optix"},
+                ]
+        },
+        {
+        "enable" : false,
+            "var" : "HOUDINI_DSO_ERROR",
+            "value" : "2"
+        },
+        {
+        "enable" : false,
+            "var" : "HOUDINI_OCL_DEVICETYPE",
+            "value" : "CPU"
+        }
+    ]
+}

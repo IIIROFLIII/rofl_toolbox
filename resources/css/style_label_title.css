@@ -1,0 +1,5 @@
+QLabel {
+	padding: 10px 0px 10px 0px;
+	border-bottom:  1px solid rgb(30, 30, 30);
+	border-top: 1px solid rgb(30, 30, 30);
+}

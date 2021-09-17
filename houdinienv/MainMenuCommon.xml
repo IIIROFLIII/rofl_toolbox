@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mainMenu>
+	<menuBar>
+    <subMenu>
+    <label>Rofl Tools</label>
+      <scriptItem id="h.scene manager">
+        <label>Scene Manager</label>
+        <scriptPath>$ROFL_TOOLS/file_manager/launch_scene_manager.py</scriptPath>
+      </scriptItem>
+      <scriptItem id="h.file copyer">
+        <label>File Copyer</label>
+        <scriptPath>$ROFL_TOOLS/file_manager/launch_file_copyer.py</scriptPath>
+      </scriptItem>
+      <scriptItem id="h.extra file manager">
+        <label>Extra Files Manager</label>
+        <scriptPath>$ROFL_TOOLS/file_manager/launch_extra_files_manager.py</scriptPath>
+      </scriptItem>
+      <scriptItem id="h.rofl player">
+        <label>File Player</label>
+        <scriptPath>$ROFL_TOOLS/file_manager/launch_rofl_player.py</scriptPath>
+      </scriptItem>
+      <scriptItem id="h.settings">
+        <label>Settings</label>
+        <scriptPath>$ROFL_TOOLS/file_manager/launch_settings.py</scriptPath>
+      </scriptItem>
+    </subMenu>		
+	</menuBar>
+</mainMenu>

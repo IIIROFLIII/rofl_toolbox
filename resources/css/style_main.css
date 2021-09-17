@@ -1,0 +1,424 @@
+QWidget {
+	background-color: #303030;
+	border: 0px;
+}
+
+QScrollBar:vertical {
+	background-color: rgb(30, 30, 30);
+	width: 8px;
+	padding-left: 2px;
+}
+
+QScrollBar::handle:vertical {
+	background: #315642;
+	min-height: 0px;
+	border-radius: 7px;
+}
+
+QScrollBar::add-line:vertical {
+	height: 0px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+	height: 0px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+}
+
+QScrollBar:horizontal {
+	background-color: rgb(30, 30, 30);
+	height: 8px;
+	padding-left: 2px;
+}
+
+QScrollBar::handle:horizontal {
+	background: #315642;
+	min-height: 0px;
+	border-radius: 7px;
+}
+
+QScrollBar::add-line:horizontal {
+	height: 0px;
+	subcontrol-position: left;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+	height: 0px;
+	subcontrol-position: right;
+	subcontrol-origin: margin;
+}
+
+QStatusBar {
+    background-color: rgb(30, 30, 30);
+    border-top: 1px solid #5BE79B;
+	color: rgb(255, 80, 80);
+}
+
+QToolBar {
+    background-color: rgb(60, 60, 60);
+	border-bottom: 3px solid rgb(30, 30, 30);
+	spacing: 3px;
+	padding: 5px;
+}
+
+QToolButton {
+    border: none;
+    background-color: rgb(60, 60, 60);
+    color: #fafafa;
+    padding: 3px;
+}
+
+QToolButton:hover {
+    color: #5BE79B;
+}
+
+QToolButton:pressed {
+    color: #315642;
+}
+
+QLabel {
+	color: #fafafa;
+    font-size: 13px;
+	font-weight: normal;
+}
+
+QLabel::focus {
+    outline: none;
+}
+
+QLineEdit {
+    background-color: rgb(30, 30, 30);
+	height: 30;
+	border: 1px solid rgb(10, 10, 10);
+	border-radius: 5px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	font-size: 13px;
+	color: #fafafa;
+    selection-color: rgb(10, 10, 10);
+    selection-background-color: #5BE79B;
+}
+
+QLineEdit::focus {
+    outline: none;
+}
+
+QListWidget {
+	border-radius: 2px;
+	border: 1px solid rgb(10, 10, 10);
+	background-color: rgb(30, 30, 30);
+    font-size: 13px;
+	margin: 0px 1px 0px 1px;
+}
+
+QListWidget::focus {
+    border: 1px solid #315642;
+    font-size: 13px;
+    outline: none;
+}
+
+QListWidget::item {
+	border: 0px;
+	background-color: rgb(30, 30, 30);
+	font-size: 13px;
+	padding: 2px 0px 2px 0px;
+}
+
+QListWidget::item:selected {
+	border-top: 1px solid #5BE79B;
+	border-bottom: 1px solid #5BE79B;
+	background-color: #315642;
+	font-size: 13px;
+}
+
+QListWidget::item:selected:!active {
+	color: #fafafa;
+}
+
+QPushButton {
+    border: 1px solid rgb(10, 10, 10);
+    font-size: 13px;
+    border-radius: 2px;
+}
+
+QPushButton::hover {
+    background-color: #5BE79B;
+}
+
+QPushButton::pressed {
+    background-color: rgb(30, 30, 30);
+}
+
+QPushButton::focus {
+   outline: none;
+}
+
+QTextEdit {
+	color: #fafafa;
+	padding: 5px;
+	border-radius: 5px;
+	margin: 1px;
+    font-size: 13px;
+	border: 1px solid #315642;
+	background-color: #181818;
+    selection-color: rgb(10, 10, 10);
+    selection-background-color: #5BE79B;
+}
+
+QTextEdit::focus {
+    outline: none;
+}
+
+QTabWidget::pane {
+	border: 0px solid #315642;
+	background-color: rgb(30, 30, 30);
+}
+
+QTabBar::tab {
+	padding: 6px;
+	border-right: 2px solid #315642;
+	color: #fafafa;
+	font-size: 13px;
+	text-align: center;
+}
+
+QTabBar::tab:selected {
+	background-color: #315642;
+	color: #fafafa;
+    border-right: 2px solid #5BE79B;
+    text-align: center;
+}
+
+QTabBar::focus {
+    outline: none;
+}
+
+QTreeWidget:hover,
+QTreeWidget:selected,
+QTreeWidget:selected:active,
+QTreeWidget:selected:!active,
+QTreeWidget {
+	border: 1px solid rgb(10, 10, 10);
+	background-color: rgb(30, 30, 30);
+	font-size: 13px;
+}
+
+QTreeWidget::item {
+	border: 0px;
+	background-color: rgb(30, 30, 30);
+    font-size: 13px;
+	color: #fafafa;
+	padding: 0px 0px 0px 0px;
+}
+
+QTreeWidget::item:hover,
+QTreeWidget::item:selected:active,
+QTreeWidget::item:selected:!active,
+QTreeWidget::item:selected {
+	border: 0px;
+	background-color: rgb(30, 30, 30);
+	font-size: 13px;
+	color: #fafafa;
+	padding: 2px 0px 2px 0px;
+}
+
+QTreeWidget::branch {
+    border: 0px;
+    background-color: rgb(30, 30, 30);
+}
+
+QTreeWidget::branch:has-siblings:!adjoins-item {
+    /*border-image: url(icons/vline.png) 0;*/
+}
+
+QTreeWidget::branch:has-siblings:adjoins-item {
+    /*border-image: url(icons/branch-more.png) 0;*/
+}
+
+QTreeWidget::branch:!has-children:!has-siblings:adjoins-item {
+    /*border-image: url(icons/branch-end.png) 0;*/
+}
+
+QTreeWidget::branch:has-children:!has-siblings:closed,
+QTreeWidget::branch:closed:has-children:has-siblings {
+    border-image: none;
+    /*image: url(icons/closed.png);*/
+}
+
+QTreeWidget::branch:open:has-children:!has-siblings,
+QTreeWidget::branch:open:has-children:has-siblings  {
+    border-image: none;
+    /*image: url(icons/open.png);*/
+}
+
+QTreeWidget::focus {
+    outline: none;
+}
+
+QTreeWidget::item:selected#IsSelectable {
+	border-top: 1px solid #5BE79B;
+	border-bottom: 1px solid #5BE79B;
+	background-color: #315642;
+	font-size: 13px;
+}
+
+QHeaderView::section {
+	background-color: #315642;
+	border-bottom: 1px solid #5BE79B;
+	color: #fafafa;
+	font-size: 10px;
+	border-radius: 1px;
+	padding-left: 7px;
+}
+
+QProgressBar {
+    border-radius: 2px;
+	border: 1px solid rgb(100, 100, 100);
+	background-color: rgb(50, 50, 50);
+	height: 5px;
+}
+
+QProgressBar::chunk {
+	background-color: #315642;
+	border-right: 2px solid #5BE79B;
+}
+
+QCheckBox {
+	color: #fafafa;
+	font-size: 13px;
+	padding: 5px 0px 5px 5px;
+	margin: 0px 0px 0px 0px;
+    border-radius: 2px;
+	border-bottom: 1px solid #1F7847;
+}
+
+QCheckBox::indicator {
+    width: 12;
+    height: 12;
+}
+
+QCheckBox::focus {
+    outline: none;
+}
+
+QComboBox {
+	height: 25px;
+	width: 150px;
+	border-radius: 2px;
+	border: 1px solid rgb(10, 10, 10);
+	background-color: rgb(30, 30, 30);
+	selection-background-color: #5BE79B;
+	selection-color: #000000;
+	padding-left: 10px;
+	color: #fafafa;
+	font-size: 16px;
+	font-weight: normal;
+}
+
+QComboBox QAbstractItemView {
+	height: 25px;
+	width: 150px;
+	border-radius: 2px;
+	border: 1px solid rgb(10, 10, 10);
+	background-color: rgb(30, 30, 30);
+	selection-background-color: #5BE79B;
+	selection-color: #000000;
+	padding-left: 0px;
+	color: #fafafa;
+}
+
+QComboBox::drop-down {
+	width: 20px;
+}
+
+QComboBox::focus {
+    outline: none;
+}
+
+QToolBox::tab {
+    background-color: #315642;
+    border-radius: 5px;
+	border-bottom: 1px solid #5BE79B;
+    color: #fafafa;
+}
+
+QToolBox::tab:selected {
+    background-color: #5BE79B;
+    border-bottom: 1px solid rgb(10, 10, 10);
+    color: rgb(10, 10, 10);
+}
+
+QSpinBox {
+    background-color: rgb(23, 23, 23);
+    border: 0px solid rgb(23, 23, 23);
+    color: #fafafa;
+    selection-color: rgb(10, 10, 10);
+    selection-background-color: #5BE79B;
+}
+
+QSpinBox::focus {
+    border: 1px solid #315642;
+    font-size: 13px;
+    outline: none;
+}
+
+QSlider::groove {
+    border: 1px solid #999999;
+    height: 0px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);*/
+    background: rgba(0, 0, 0, 0);
+    margin: 2px 0;
+}
+
+QSlider::handle {
+    background: #5BE79B;
+    border: 1px solid #315642;
+    width: 10px;
+    margin: -10px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 3px;
+}
+
+QSlider::add-page {
+    background: rgba(30, 30, 30, 255);
+}
+
+QSlider::sub-page {
+    background: #315642;
+}
+
+QGroupBox {
+    border-top: 1px solid gray;
+    margin-top: 1ex; /* leave space at the top for the title */
+    padding: 10 0 0 0px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* position at the top center */
+    padding: 0 10 0 0;
+    color: #fafafa
+}
+
+QLabel#IsValid {
+    color: rgb(91, 231, 155);
+}
+
+QLabel#IsMaybeValid {
+    color: rgb(231, 201, 91);
+}
+
+QLabel#IsNotValid {
+    color: rgb(231, 112, 91);
+}
+
+QLabel#View {
+    background-color: rgb(0, 0, 0);
+}
+
+QListWidget#Generic {
+    color: #fafafa
+}
+
