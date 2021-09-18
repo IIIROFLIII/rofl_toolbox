@@ -8,6 +8,45 @@ class EfmHoudini(EfmGeneric):
     def __init__(self):
         EfmGeneric.__init__(self)
 
+    def _append_parm_not_found(self, files):
+        """
+        append a parm with its file path in the file reference
+        certain parms are not recognize by the hou.fileReferences() because of cloning parameters.
+        ex: filecache node, the file parameter is not recognize by the fileReferences
+        so, just the parameters inside the locked hda are recognize, but it cannot be repathable for the ranch
+        so the files can be copied, but no parameters can be repathed on it
+        this function check the reference parameters for all parms, and if the parm
+        is not already inside the fileReferenced list, we had this missed parameters
+        Args:
+            files: the files referenced list
+
+        Returns: the updated files referenced list
+
+        """
+        # get all the parms found
+        all_parms = [file[0] for file in files]
+        files_update = list(files)
+        for parm, file in files:
+            if not parm:
+                continue
+            # check if the node is inside a locked HDA
+            if not parm.node().isInsideLockedHDA():
+                continue
+            # check if the ref parm is different from the current parm
+            ref_parm = parm.getReferencedParm()
+            if ref_parm == parm:
+                continue
+            if not ref_parm:
+                continue
+            # check if the ref parm is already inside the fileReferenced list
+            if ref_parm in all_parms:
+                continue
+
+            files_update.append((ref_parm, file))
+
+        files_update = tuple(files_update)
+        return files_update
+
     def get_files(self, selected_items):
         """
         get all the selected files and copy it in the asset folder
@@ -61,7 +100,26 @@ class EfmHoudini(EfmGeneric):
             return True
         return False
 
-    def manage_houdini_scenes(self, extension, parm, file, parm_path, lock_state):
+    def manage_OTL(self, extension, parm, file, parm_path, lock_state):
+        """
+        management of HDA during the refresh function
+        Args:
+            extension: extension of the file
+            parm: current parm
+            file: the hda file
+            parm_path: current parm path (None in this case)
+            lock_state: if the parm node is inside locked HDA (True by default)
+
+        Returns: True if succeed
+
+        """
+        if not parm and "otl" in extension:
+            frames = {file: file}
+            self.add_to_database(".OTL", True, file, parm_path, lock_state, frames)
+            return True
+        return False
+
+    def manage_houdini_scenes(self, extension, file, parm_path, lock_state):
         """
         management of houdini scene during the refresh function
         Args:
@@ -111,22 +169,31 @@ class EfmHoudini(EfmGeneric):
         hou.setUpdateMode(hou.updateMode.Manual)
         files = hou.fileReferences(include_all_refs=True)
         hou.setUpdateMode(hou.updateMode.AutoUpdate)
+        files_update = self._append_parm_not_found(files=files)
 
-        for parm, file in files:
+        for parm, file in files_update:
             extension = os.path.splitext(file)[-1]
             parm_path = parm.path() if parm else "None"
             lock_state = parm.node().isInsideLockedHDA() if parm else True
             parm_eval = parm.eval() if parm else None
+            if file.startswith("$HIP/"):
+                file = file.replace("$HIP/", hou.hscriptExpression("$HIP") + "/")
 
-            if self.manage_houdini_scenes(extension, parm, file, parm_path, lock_state):
+            if self.manage_houdini_scenes(extension, file, parm_path, lock_state):
                 continue
             if self.manage_HDA(extension, parm, file, parm_path, lock_state):
+                continue
+            if self.manage_OTL(extension, parm, file, parm_path, lock_state):
                 continue
             if self.manage_rofl_tools(parm, file, parm_path, lock_state):
                 continue
             if self.manage_already_imported(self.SID, parm_eval, file, parm_path, lock_state):
                 continue
             if self.manage_folder(parm_eval, file, parm_path, lock_state):
+                continue
+            if self.manage_non_ascii(file, parm_path, lock_state):
+                continue
+            if self.manage_udim(parm_eval, file, parm_path, lock_state):
                 continue
             if self.manage_files(extension, parm, file, parm_path, lock_state):
                 continue

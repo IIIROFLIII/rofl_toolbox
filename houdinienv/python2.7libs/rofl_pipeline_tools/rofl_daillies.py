@@ -177,10 +177,11 @@ class Daillies(Flipbook):
         if not self.node_name == session:
             return False
 
-        if not Flipbook(self.node).on_deleted():
+        if not Flipbook(self.node).on_deleted_base():
             return False
 
         self.build_daillies_SID()
+        self.bdd.SID = self.bdd.sid_replace_version(new_version="000")
         session_folder = self.bdd.SID_wedger_folder_session(session=session)
         if not os.path.exists(session_folder):
             return False
@@ -201,10 +202,11 @@ class Daillies(Flipbook):
         if not self.read_version.evalAsString() == "000":
             return False
 
-        if not self.search_release.eval():
+        if self.search_release.eval():
             return False
 
         self.build_daillies_SID()
+        self.bdd.SID = self.bdd.sid_replace_version(new_version="000")
         session_folder = self.bdd.SID_wedger_folder_session(session=session)
         old_session_folder = os.path.join(os.path.dirname(session_folder), oldNode)
         if not os.path.exists(old_session_folder):

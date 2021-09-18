@@ -241,16 +241,30 @@ class FileCache(FileCacheLayer):
         return files
 
     def get_layers(self):
+        """
+        get all the file_cache_layer used by the current ranch cache in the node graph
+        Returns: a list of all the file cache layer
+
+        """
         layers = []
+        # follow_subnets=True
         allInputs = self.node.inputAncestors()
         for i in allInputs:
             nodeType = i.type().name()
             # break the loop if we encounter a standrad rofl_filecache
             if nodeType == ROFL_CACHE:
                 break
-            # activate / deactivate wedging on rofl filecache layer
-            if nodeType == ROFL_CACHE_LAYER:
+
+            if nodeType == ROFL_CACHE_LAYER and not i.isBypassed():
                 layers.append(i)
+
+        input_node = self.node.inputs()[0]
+        allInputs = input_node.inputAncestors(follow_subnets=True)
+        for i in allInputs:
+            if i.name() == "file1" or i.name() == "file2":
+                if ROFL_CACHE_LAYER in i.parent().type().name():
+                    if i.parent() in layers:
+                        layers.remove(i.parent())
 
         return layers
 
@@ -325,6 +339,11 @@ class FileCache(FileCacheLayer):
             self.read_version.set("000")
             self.link_layer_reset_version()
 
+        for layer in self.get_layers():
+            layer = FileCacheLayer(layer)
+            layer.enable_write.deleteAllKeyframes()
+            layer.enable_write.set(1)
+
         if not self.geo_type.evalAsString() == 'abc':
             self.rop_geo.parm('execute').pressButton()
             # SET SINGLE FRAME
@@ -335,6 +354,9 @@ class FileCache(FileCacheLayer):
 
         # RELOAD
         self.reload()
+        for layer in self.get_layers():
+            layer = FileCacheLayer(layer)
+            layer.enable_write.setExpression("@allow_layer")
 
     def send_to_pdg(self):
         """

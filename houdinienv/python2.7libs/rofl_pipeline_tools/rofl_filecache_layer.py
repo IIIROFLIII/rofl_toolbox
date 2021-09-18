@@ -20,6 +20,10 @@ class FileCacheLayer(GenericTools):
         return self.node.parm('cacheVersion')
 
     @property
+    def enable_write(self):
+        return self.node.parm("enable_write")
+
+    @property
     def file_geo(self):
         return hou.node(self.node_path + '/file1')
 

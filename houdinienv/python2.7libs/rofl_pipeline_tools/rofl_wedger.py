@@ -91,12 +91,12 @@ class Wedger(Flipbook):
 
         return self.bdd.SID
 
-    def build_wedger_SID(self, script_padding=False, force_sid=None):
+    def build_wedger_SID(self, script_padding=False, force_sid=None, mp4=False):
         """
         build a sid for output file
         """
         suffix = self.wedge_suffix.eval()
-        frame = self.find_frame(script_padding=script_padding)
+        frame = self.find_frame(script_padding=script_padding, mp4=mp4)
 
         self.bdd.SID = self.bdd.sid_replace_version(self.read_version.evalAsString()) if not force_sid else force_sid
         self.bdd.SID = self.bdd.build_SID_file(name=suffix, frame=frame)
@@ -152,6 +152,37 @@ class Wedger(Flipbook):
             text += '\n'
 
         return text
+
+    # def _get_column(self, head="", number="0", nb_elements=0):
+    #     """
+    #     set the text for elements part
+    #     Returns: the text
+    #
+    #     """
+    #     text = "{0}\n\n".format(head)
+    #     for i in range(nb_elements):
+    #         iteration = str(i+1)
+    #
+    #         cur_node = self._node_iteration(iteration, number)
+    #         if not cur_node:
+    #             continue
+    #
+    #         text += cur_node.path() + '\n\n'
+    #         # GET PARMS
+    #         nb_parms = self.node.parm('parms{0}_{1}'.format(iteration, number)).eval()
+    #         for j in range(nb_parms):
+    #             iteration2 = str(j + 1)
+    #             parm = self.node.parm('parm{0}_{1}_{2}'.format(iteration, iteration2, number))
+    #             parm_name = parm.eval()
+    #             if not hou.parm("{0}/{1}".format(cur_node.path(), parm_name)) and parm_name != "":
+    #                 self._message_info("Please set a correct parm for {0}".format(parm.name()))
+    #                 continue
+    #
+    #             value = 'value{0}_{1}_{2}'.format(iteration, iteration2, number)
+    #             text += '''    {0} = `chs("{1}/{2}")`'''.format(parm_name, self.node_path, value) + '\n'
+    #         text += '\n'
+    #
+    #     return text
 
     def _get_filecache_sequencer(self, item):
         """
@@ -489,7 +520,10 @@ class Wedger(Flipbook):
         if not os.path.exists(scene_path):
             return False
 
-        os.remove(scene_path)
+        self.bdd.SID = self.bdd.sid_replace_version(new_version="000")
+        folder = self.bdd.SID_wedger_folder_session(session=self.session.eval())
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
 
     def on_input_changed(self):
         self.generate_layout()
@@ -513,12 +547,14 @@ class Wedger(Flipbook):
         if not self.read_version.evalAsString() == "000":
             return False
 
-        if not self.search_release.eval():
+        if self.search_release.eval():
             return False
 
         self.build_wedger_SID()
+        self.bdd.SID = self.bdd.sid_replace_version(new_version="000")
         session_folder = self.bdd.SID_wedger_folder_session(session=session)
         old_session_folder = os.path.join(os.path.dirname(session_folder), oldNode)
+
         if not os.path.exists(old_session_folder):
             return False
 
@@ -563,7 +599,7 @@ class Wedger(Flipbook):
         Returns: the output file path
 
         """
-        self.build_wedger_SID(force_sid=force_sid)
+        self.build_wedger_SID(force_sid=force_sid, mp4=True)
         session = self.session.eval()
         search_release = self.search_release.eval()
         if release:

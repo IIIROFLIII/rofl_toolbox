@@ -276,63 +276,6 @@ class EfmGeneric(DataBase):
         """
         self.add_to_database("ERROR", False, file.split("\n")[0], parm_path, lock_state)
 
-    # def manage_files_generic(self, file_path, extension, is_sequence, file, parm_path, lock_state):
-    #     """
-    #     management of files during the refresh function
-    #     Args:
-    #         file_path: the expanded string of the parm
-    #         extension: extension of the file
-    #         is_sequence: if the string parm is aninmated or not
-    #         file: the file expression in houdini
-    #         parm_path: current parm path (None in this case)
-    #         lock_state: if the parm node is inside locked HDA (no repathing possible if True)
-    #
-    #     Returns: True if succeed
-    #
-    #     """
-    #     # check file folder
-    #     file_folder = os.path.dirname(file_path)
-    #     if not os.path.exists(file_folder):
-    #         return False
-    #
-    #     # get files infos
-    #     file_name = os.path.basename(file_path)
-    #     postfix, prefix = [x[::-1] for x in re.split('[0-9][0-9]+', file_name[::-1], 1)]
-    #     extension = os.path.splitext(file_path)[-1] if not extension else extension
-    #     extension = ".bgeo" if extension == ".sc" else extension
-    #
-    #     is_exist = True if self.get_files_infos(extension, file_path) else False
-    #     # manage not sequence files
-    #     if not is_sequence:
-    #         if not is_exist:
-    #             if not os.path.exists(file_path):
-    #                 return False
-    #         frames = [file_path]
-    #         self.add_to_database(extension, True, file_path, parm_path, lock_state, frames, is_exist=is_exist)
-    #         return True
-    #
-    #     # manage sequence files
-    #     frame_digits = len(file_name) - len(prefix) - len(postfix)
-    #     if prefix[-1] == '-':
-    #         prefix = prefix[0:-1]
-    #     padding = "$F{0}".format(frame_digits)
-    #     sequence_path = os.path.join(file_folder, prefix + padding + postfix)
-    #
-    #     is_exist = True if self.get_files_infos(extension, sequence_path) else False
-    #     # don't look for files if the file exist in the database
-    #     if not is_exist:
-    #         frames = sorted(glob(sequence_path.replace(padding, '-' + '[0-9]' * frame_digits)), reverse=True)
-    #         frames += sorted(glob(sequence_path.replace(padding, '[0-9]' * frame_digits)))
-    #     else:
-    #         frames = self.get_files_source(extension, sequence_path)
-    #
-    #     # add elements in database
-    #     if not frames:
-    #         self.add_to_database("NO_FILES_FOUND", False, file, parm_path, lock_state)
-    #         return True
-    #     self.add_to_database(extension, True, sequence_path, parm_path, lock_state, frames, is_exist=is_exist)
-    #     return True
-
     def manage_files_generic(self, file_path, extension, is_sequence, file, parm_path, lock_state):
         """
         management of files during the refresh function
@@ -369,22 +312,29 @@ class EfmGeneric(DataBase):
             self.add_to_database(extension, True, file_path, parm_path, lock_state, frames, is_exist=is_exist)
             return True
 
-        postfix, prefix = [x[::-1] for x in re.split('[0-9][0-9]*', file_name[::-1], 1)]
+        analyze_string = [x[::-1] for x in re.split('[0-9][0-9]*', file_name[::-1], 1)]
+        if len(analyze_string) == 1:
+            analyze_string.append("error")
+
+        postfix, prefix = analyze_string
+        frames = [i for i in os.listdir(file_folder) if postfix in i and prefix in i]
+        padding = [len(i.replace(postfix, "").replace(prefix, "")) for i in frames]
+        padding = sorted(set(padding))
         # manage sequence files
         frame_digits = len(file_name) - len(prefix) - len(postfix)
         if prefix[-1] == '-':
             prefix = prefix[0:-1]
-        padding = "$F{0}".format(frame_digits)
-        sequence_path = os.path.join(file_folder, prefix + padding + postfix)
+        frame_digits_string = "" if frame_digits == 1 else str(frame_digits)
+        padding = "$F{0}".format(frame_digits_string) if len(padding) == 1 else "$F"
+        sequence_path = os.path.join(file_folder, prefix + padding + postfix).replace("\\", "/")
 
         is_exist = True if self.get_files_infos(extension, sequence_path) else False
-        # don't look for files if the file exist in the database
-        if not is_exist:
-            frames = sorted(glob(sequence_path.replace(padding, '-' + '[0-9]' * frame_digits)), reverse=True)
-            frames += sorted(glob(sequence_path.replace(padding, '[0-9]' * frame_digits)))
-        else:
+        if is_exist:
             frames = self.get_files_source(extension, sequence_path)
+        else:
+            frames = [os.path.join(file_folder, frame) for frame in frames]
 
+        frames = [frame.replace("\\", "/") for frame in frames]
         # add elements in database
         if not frames:
             self.add_to_database("NO_FILES_FOUND", False, file, parm_path, lock_state)
@@ -406,6 +356,66 @@ class EfmGeneric(DataBase):
         """
         if os.path.isdir(parm_eval):
             self.add_to_database("IS_FOLDER", False, file, parm_path, lock_state)
+            return True
+        return False
+
+    def manage_non_ascii(self, file, parm_path, lock_state):
+        """
+        management of files which characters path are not ASCII file format
+        Args:
+            file: the file expression of the main_output
+            parm_path: current parm path
+            lock_state: if the parm node is inside locked HDA (no repathing possible if True)
+
+        Returns: True if succeed
+
+        """
+        if not os.path.isdir(os.path.dirname(file)):
+            return False
+        if not all(ord(c) < 128 for c in file):
+            self.add_to_database("NOT_ASCII", False, file, parm_path, lock_state)
+            return True
+        return False
+
+    def manage_udim(self, parm_eval, file, parm_path, lock_state):
+        """
+        management of files which characters udim
+        Args:
+            parm_eval: the parm value evaluated by eval() function
+            file: the file expression of the main_output
+            parm_path: current parm path
+            lock_state: if the parm node is inside locked HDA (no repathing possible if True)
+
+        Returns: True if succeed
+
+        """
+        if "udim" in parm_eval or "UDIM" in parm_eval:
+            file_name = os.path.basename(file)
+            folder = os.path.dirname(file)
+            basename, extension = os.path.splitext(file_name)
+            basename = basename.replace("udim", "")
+            basename = basename.replace("UDIM", "")
+            basename = basename.replace("<", "")
+            basename = basename.replace(">", "")
+            basename = basename.replace("(", "")
+            basename = basename.replace(")d", "")
+            basename = basename.replace("%", "")
+            frames = []
+            if not os.path.exists(folder):
+                self.add_to_database("NO_FILES_FOUND", False, file, parm_path, lock_state)
+                return True
+
+            for cur_file in os.listdir(folder):
+                if basename in cur_file and extension in file:
+                    frames.append(os.path.join(folder, cur_file).replace("\\", "/"))
+
+            # add elements in database
+            if not frames:
+                self.add_to_database("NO_FILES_FOUND", False, file, parm_path, lock_state)
+                return True
+
+            is_exist = True if self.get_files_infos(extension, file) else False
+            self.add_to_database(extension, True, file, parm_path, lock_state, frames, is_exist=is_exist)
             return True
         return False
 

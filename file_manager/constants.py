@@ -1,10 +1,10 @@
 import os
 
 USER_HOME = os.path.expanduser("~")
-FC_SETTINGS = os.path.join(USER_HOME, ".FC_settings.json")
-SM_SETTINGS = os.path.join(USER_HOME, ".SM_settings.json")
-SP_SETTINGS = os.path.join(USER_HOME, ".SP_settings.json")
-MP4_FOLDER = os.path.join(USER_HOME, ".mp4_to_seq")
+FC_SETTINGS = os.path.join(USER_HOME, ".rofl", ".FC_settings.json")
+SM_SETTINGS = os.path.join(USER_HOME, ".rofl", ".SM_settings.json")
+SP_SETTINGS = os.path.join(USER_HOME, ".rofl", ".SP_settings.json")
+MP4_FOLDER = os.path.join(USER_HOME, ".rofl", ".mp4_to_seq")
 
 SOFTWARES = ["None", "Houdini"]
 
