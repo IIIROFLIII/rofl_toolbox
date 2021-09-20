@@ -710,6 +710,7 @@ class SceneManager(QtWidgets.QWidget):
         self._set_software_filter(self._init_software)
         # generate settings json if not exist
         if not os.path.exists(SM_SETTINGS):
+            os.makedirs(os.path.dirname(SM_SETTINGS))
             self._settings_save({})
         # refresh data and apply settings
         data = self._settings_read()
