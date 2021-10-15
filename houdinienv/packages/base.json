@@ -31,9 +31,8 @@
             "value" : "Welcome to FX Houdini"
         },
         {
-            "enable" : false,
             "var" : "OCIO",
-            "value" : "$ROFL_TOOLS/ressources/lut/OpenColorIO-Configs-master/aces_1.0.3/config.ocio"
+            "value" : "$ROFL_TOOLS/resources/lut/OpenColorIO-Configs-master/aces_1.0.3/config.ocio"
         },
         {
             "var" : "VISUAL",

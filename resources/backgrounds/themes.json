@@ -23,7 +23,7 @@
             0.365
         ]
     }, 
-    "default": "light classic", 
+    "default": "dark classic", 
     "light classic": {
         "bottom": [
             0.75, 
