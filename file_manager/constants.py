@@ -7,7 +7,7 @@ SP_SETTINGS = os.path.join(USER_HOME, ".rofl", ".SP_settings.json")
 MP4_FOLDER = os.path.join(USER_HOME, ".rofl", ".mp4_to_seq")
 
 SOFTWARES = ["None", "Houdini"]
-
+test = 10
 MSG = {
     "COMMENTARIES_NOT_GIVEN": "Commentaries were not provide",
     "ENTER_ALIAS": "Please, set an alias project label",
